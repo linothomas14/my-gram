@@ -2,6 +2,7 @@ package router
 
 import (
 	"my-gram/controller"
+	"my-gram/middlewares"
 
 	"github.com/gin-gonic/gin"
 )
@@ -11,14 +12,15 @@ func StartApp() *gin.Engine {
 	userRouter := r.Group("/users")
 	{
 		userRouter.POST("/register", controller.UserRegister)
-		userRouter.POST("/login", controller.IndexHandler)
+		userRouter.POST("/login", controller.UserLogin)
 		userRouter.PUT("/", controller.IndexHandler)
 		userRouter.DELETE("/", controller.IndexHandler)
 	}
 
 	photoRouter := r.Group("/photos")
 	{
-		photoRouter.POST("/", controller.IndexHandler)
+		photoRouter.Use(middlewares.Authentication())
+		photoRouter.POST("/", controller.PostPhoto)
 		photoRouter.GET("/", controller.IndexHandler)
 		photoRouter.PUT(":photoId", controller.IndexHandler)
 		photoRouter.DELETE(":photoId", controller.IndexHandler)
