@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"log"
 	"my-gram/database"
 	"my-gram/helpers"
 	"my-gram/models"
@@ -26,7 +25,6 @@ func PostPhoto(c *gin.Context) {
 	}
 
 	Photo.UserID = UserID
-	log.Println("Ini struct photo =", Photo)
 	err := db.Debug().Create(&Photo).Error
 
 	if err != nil {
@@ -45,6 +43,19 @@ func PostPhoto(c *gin.Context) {
 		"created_at": Photo.CreatedAt,
 	})
 }
+
+// func ReadAllPhoto(c *gin.Context) {
+// 	db := database.GetDB()
+// 	userData := c.MustGet("userData").(jwt.MapClaims)
+
+// 	var Photos []models.Photo
+// 	UserID := uint(userData["id"].(float64))
+
+// 	db.Preload("Users").Find(&Photos)
+// 	c.JSON(http.StatusOK, gin.H{
+// 		"Photo": Photos,
+// 	})
+// }
 
 // func UpdatePhoto(c *gin.Context){
 // 	db := database.GetDB()

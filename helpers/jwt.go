@@ -31,7 +31,9 @@ func VerifyToken(c *gin.Context) (interface{}, error) {
 	if !bearer {
 		return nil, errResponse
 	}
-
+	if len(headerToken) <= 6 {
+		return nil, errResponse
+	}
 	stringToken := strings.Split(headerToken, " ")[1]
 
 	token, _ := jwt.Parse(stringToken, func(t *jwt.Token) (interface{}, error) {
