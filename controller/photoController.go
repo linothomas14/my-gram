@@ -44,18 +44,18 @@ func PostPhoto(c *gin.Context) {
 	})
 }
 
-// func ReadAllPhoto(c *gin.Context) {
-// 	db := database.GetDB()
-// 	userData := c.MustGet("userData").(jwt.MapClaims)
+func ReadAllPhoto(c *gin.Context) {
+	db := database.GetDB()
+	userData := c.MustGet("userData").(jwt.MapClaims)
 
-// 	var Photos []models.Photo
-// 	UserID := uint(userData["id"].(float64))
+	var Photo []models.Photo
+	UserID := uint(userData["id"].(float64))
 
-// 	db.Preload("Users").Find(&Photos)
-// 	c.JSON(http.StatusOK, gin.H{
-// 		"Photo": Photos,
-// 	})
-// }
+	db.Where("user_id = ?", UserID).Find(&Photo)
+	c.JSON(http.StatusOK, gin.H{
+		"data": Photo,
+	})
+}
 
 // func UpdatePhoto(c *gin.Context){
 // 	db := database.GetDB()
