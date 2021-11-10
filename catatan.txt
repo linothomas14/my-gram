@@ -1,0 +1,5 @@
+- Menggunakan 2 lib validasi atau menggunakan validasi "github.com/go-playground/validator/v10" 
+tetapi tidak ada custom message error
+
+- endpoint photo tidak mengembalikan data detail user(email dan username) seperti yang ditugaskan pada projek2, tetapi
+untuk contoh yang ada di sesi 10, tidak diajarkan cara mencantumkan data user pada data
