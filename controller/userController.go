@@ -24,6 +24,7 @@ func UserRegister(c *gin.Context) {
 	db := database.GetDB()
 	contentType := helpers.GetContentType(c)
 	_, _ = db, contentType
+
 	User := models.User{}
 
 	if contentType == appJSON {
@@ -31,6 +32,7 @@ func UserRegister(c *gin.Context) {
 	} else {
 		c.ShouldBind(&User)
 	}
+
 	err := db.Debug().Create(&User).Error
 
 	if err != nil {
