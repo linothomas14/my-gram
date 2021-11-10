@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"fmt"
 	"my-gram/database"
 	"my-gram/helpers"
 	"my-gram/models"
@@ -37,17 +36,22 @@ func UserRegister(c *gin.Context) {
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  http.StatusBadRequest,
 			"error":   "Bad Request",
 			"message": err.Error(),
+			"data":    nil,
 		})
 		return
 	}
 
 	c.JSON(http.StatusCreated, gin.H{
-		"age":      User.Age,
-		"email":    User.Email,
-		"id":       User.ID,
-		"username": User.Username,
+		"status": http.StatusCreated,
+		"data": map[string]interface{}{
+			"age":      User.Age,
+			"email":    User.Email,
+			"id":       User.ID,
+			"username": User.Username,
+		},
 	})
 }
 
@@ -69,24 +73,31 @@ func UserLogin(c *gin.Context) {
 
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{
+			"status":  http.StatusUnauthorized,
 			"error":   "Unauthorized",
 			"message": "Invalid email/password",
+			"data":    nil,
 		})
 		return
 	}
 	comparePass := helpers.ComparePass([]byte(User.Password), []byte(password))
 	if !comparePass {
-		fmt.Println("Masuk sini")
+
 		c.JSON(http.StatusUnauthorized, gin.H{
+			"status":  http.StatusUnauthorized,
 			"error":   "Unauthorized",
 			"message": "Invalid email/password",
+			"data":    nil,
 		})
 		return
 	}
 	token := helpers.GenerateToken(User.ID, User.Email)
 
 	c.JSON(http.StatusOK, gin.H{
-		"token": token,
+		"status": http.StatusOK,
+		"data": map[string]interface{}{
+			"token": token,
+		},
 	})
 }
 
@@ -112,8 +123,10 @@ func UserUpdate(c *gin.Context) {
 
 	if errUpdate != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  http.StatusBadRequest,
 			"error":   "Update Not Valid",
 			"message": errUpdate,
+			"data":    nil,
 		})
 		return
 	}
@@ -121,18 +134,23 @@ func UserUpdate(c *gin.Context) {
 	err := db.Debug().Model(&User).Updates(models.User{Email: User.Email, Username: User.Username}).Error
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  http.StatusBadRequest,
 			"error":   "Bad Request",
 			"message": err.Error(),
+			"data":    nil,
 		})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"age":        User.Age,
-		"email":      User.Email,
-		"id":         User.ID,
-		"username":   User.Username,
-		"updated_at": User.UpdatedAt,
+		"status": http.StatusOK,
+		"data": map[string]interface{}{
+			"age":        User.Age,
+			"email":      User.Email,
+			"id":         User.ID,
+			"username":   User.Username,
+			"updated_at": User.UpdatedAt,
+		},
 	})
 }
 
@@ -147,11 +165,16 @@ func UserDelete(c *gin.Context) {
 	err := db.Where("id = ?", UserID).Delete(&User).Error
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  http.StatusBadRequest,
 			"message": err,
+			"data":    nil,
 		})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Your account has been successfully deleted",
+		"status": http.StatusOK,
+		"data": map[string]interface{}{
+			"message": "Your account has been successfully deleted",
+		},
 	})
 }

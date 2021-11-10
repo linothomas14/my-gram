@@ -29,18 +29,22 @@ func PostPhoto(c *gin.Context) {
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  http.StatusBadRequest,
 			"err":     "Bad Request",
 			"message": err.Error(),
 		})
 		return
 	}
 	c.JSON(http.StatusCreated, gin.H{
-		"id":         Photo.ID,
-		"title":      Photo.Title,
-		"caption":    Photo.Caption,
-		"photo_url":  Photo.PhotoUrl,
-		"user_id":    Photo.UserID,
-		"created_at": Photo.CreatedAt,
+		"status": http.StatusCreated,
+		"data": map[string]interface{}{
+			"id":         Photo.ID,
+			"title":      Photo.Title,
+			"caption":    Photo.Caption,
+			"photo_url":  Photo.PhotoUrl,
+			"user_id":    Photo.UserID,
+			"created_at": Photo.CreatedAt,
+		},
 	})
 }
 
@@ -51,9 +55,20 @@ func ReadAllPhoto(c *gin.Context) {
 	var Photo []models.Photo
 	UserID := uint(userData["id"].(float64))
 
-	db.Where("user_id = ?", UserID).Find(&Photo)
+	err := db.Debug().Where("user_id = ?", UserID).Find(&Photo).Error
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  http.StatusBadRequest,
+			"err":     "Bad Request",
+			"message": err.Error(),
+		})
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{
-		"data": Photo,
+		"status": http.StatusOK,
+		"data":   Photo,
 	})
 }
 
