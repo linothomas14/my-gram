@@ -73,6 +73,7 @@ func UpdatePhoto(c *gin.Context) {
 	userData := c.MustGet("userData").(jwt.MapClaims)
 	UserID := uint(userData["id"].(float64))
 	contentType := helpers.GetContentType(c)
+
 	_, _ = db, contentType
 	Photo := models.Photo{}
 
@@ -80,7 +81,7 @@ func UpdatePhoto(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"err":     "Bad Request",
-			"message": "Cant find idPhoto(1)",
+			"message": "Cant Parse from Param to uint64",
 		})
 		return
 	}
@@ -102,10 +103,7 @@ func UpdatePhoto(c *gin.Context) {
 	} else {
 		c.ShouldBind(&Photo)
 	}
-	// Photo.UserID = UserID
-
 	result := db.Model(&Photo).Where("user_id = ?", UserID).Updates(Photo)
-	// log.Println(Photo)
 	if result.RowsAffected < 1 {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"err":     "Bad Request",
