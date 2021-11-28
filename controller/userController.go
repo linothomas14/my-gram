@@ -56,7 +56,6 @@ func UserLogin(c *gin.Context) {
 	contentType := helpers.GetContentType(c)
 	_, _ = db, contentType
 	User := models.User{}
-	password := ""
 
 	if contentType == appJSON {
 		c.ShouldBindJSON(&User)
@@ -64,7 +63,7 @@ func UserLogin(c *gin.Context) {
 		c.ShouldBind(&User)
 	}
 
-	password = User.Password
+	password := User.Password
 	err := db.Debug().Where("email=?", User.Email).Take(&User).Error
 
 	if err != nil {
@@ -133,11 +132,10 @@ func UserUpdate(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-
-		"age":        User.Age,
-		"email":      User.Email,
 		"id":         User.ID,
+		"email":      User.Email,
 		"username":   User.Username,
+		"age":        User.Age,
 		"updated_at": User.UpdatedAt,
 	})
 }
@@ -159,7 +157,6 @@ func UserDelete(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
-
 		"message": "Your account has been successfully deleted",
 	})
 }

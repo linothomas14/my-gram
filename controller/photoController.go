@@ -5,6 +5,7 @@ import (
 	"my-gram/helpers"
 	"my-gram/models"
 	"net/http"
+	"strconv"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
@@ -67,9 +68,75 @@ func ReadAllPhoto(c *gin.Context) {
 		"data": Photo,
 	})
 }
+func UpdatePhoto(c *gin.Context) {
+	db := database.GetDB()
+	userData := c.MustGet("userData").(jwt.MapClaims)
+	UserID := uint(userData["id"].(float64))
+	contentType := helpers.GetContentType(c)
+	_, _ = db, contentType
+	Photo := models.Photo{}
 
-// func UpdatePhoto(c *gin.Context){
-// 	db := database.GetDB()
-// 	contentType := helpers.GetContentType(c)
+	idTemp, err := strconv.ParseUint(c.Param("photoId"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"err":     "Bad Request",
+			"message": "Cant find idPhoto(1)",
+		})
+		return
+	}
+	var id uint = uint(idTemp)
 
-// }
+	Photo.ID = id
+
+	err = db.First(&Photo).Error
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"err":     "Bad Request",
+			"message": "Cant find idPhoto",
+		})
+		return
+	}
+
+	if contentType == appJSON {
+		c.ShouldBindJSON(&Photo)
+	} else {
+		c.ShouldBind(&Photo)
+	}
+	// Photo.UserID = UserID
+
+	result := db.Model(&Photo).Where("user_id = ?", UserID).Updates(Photo)
+	// log.Println(Photo)
+	if result.RowsAffected < 1 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"err":     "Bad Request",
+			"message": "Cant find idPhoto",
+		})
+		return
+	}
+	c.JSON(http.StatusOK, Photo)
+}
+
+func DeletePhoto(c *gin.Context) {
+	db := database.GetDB()
+	userData := c.MustGet("userData").(jwt.MapClaims)
+	UserID := uint(userData["id"].(float64))
+
+	Photo := models.Photo{}
+	id := c.Param("photoId")
+
+	result := db.Debug().Where("user_id = ?", UserID).Delete(&Photo, id)
+
+	if result.RowsAffected < 1 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"err":     "Bad Request",
+			"message": "Cant find idPhoto",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"id":      id,
+		"user_id": userData,
+		"message": "Your photo has been successfully deleted",
+	})
+}
