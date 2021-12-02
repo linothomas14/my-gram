@@ -11,10 +11,7 @@ import (
 	"gorm.io/gorm"
 )
 
-var (
-	db  *gorm.DB
-	err error
-)
+var db  *gorm.DB
 
 func StartDB() {
 	err := godotenv.Load()
@@ -36,7 +33,7 @@ func StartDB() {
 	}
 
 	fmt.Println("success connect to database")
-	db.Debug().AutoMigrate(models.User{}, models.Photo{})
+	db.Debug().AutoMigrate(models.User{}, models.Photo{},models.Comment{}, models.SocialMedia{})
 }
 
 func GetDB() *gorm.DB {
