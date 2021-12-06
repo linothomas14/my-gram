@@ -126,8 +126,7 @@ func UpdatePhoto(c *gin.Context) {
 	} else {
 		c.ShouldBind(&Photo)
 	}
-	// Photo.UserID = UserID
-	log.Println(Photo)
+
 	result := db.Model(&Photo).Where("user_id = ?", UserID).Updates(&Photo)
 
 	log.Println(Photo)
@@ -138,13 +137,7 @@ func UpdatePhoto(c *gin.Context) {
 		})
 		return
 	}
-	// if result != nil {
-	// 	c.JSON(http.StatusBadRequest, gin.H{
-	// 		"err":     "Bad Request",
-	// 		"message": result.Error(),
-	// 	})
-	// 	return
-	// }
+
 	c.JSON(http.StatusOK, Photo)
 }
 
