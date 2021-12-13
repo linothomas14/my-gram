@@ -38,6 +38,15 @@ type PhotoIncludeUserData struct {
 	}
 }
 
+type ResponseCommentUpdate struct {
+	ID        uint       `json:"id"`
+	UpdatedAt *time.Time `json:"updated_at"`
+	Title     string     `json:"title" `
+	Caption   string     `json:"caption"`
+	PhotoUrl  string     `json:"photo_url"`
+	UserID    uint
+}
+
 func (u *Photo) BeforeCreate(tx *gorm.DB) (err error) {
 	_, errVal := govalidator.ValidateStruct(u)
 	if errVal != nil {
