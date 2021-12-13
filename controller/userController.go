@@ -43,10 +43,11 @@ func UserRegister(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, gin.H{
-		"age":      User.Age,
-		"email":    User.Email,
-		"id":       User.ID,
-		"username": User.Username,
+		"status": http.StatusCreated,
+		"data": gin.H{"age": User.Age,
+			"email":    User.Email,
+			"id":       User.ID,
+			"username": User.Username},
 	})
 }
 
@@ -86,8 +87,10 @@ func UserLogin(c *gin.Context) {
 	token := helpers.GenerateToken(User.ID, User.Email)
 
 	c.JSON(http.StatusOK, gin.H{
-
-		"token": token,
+		"status": http.StatusOK,
+		"data": gin.H{
+			"token": token,
+		},
 	})
 }
 
@@ -131,11 +134,14 @@ func UserUpdate(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"id":         User.ID,
-		"email":      User.Email,
-		"username":   User.Username,
-		"age":        User.Age,
-		"updated_at": User.UpdatedAt,
+		"status": http.StatusOK,
+		"data": gin.H{
+			"id":         User.ID,
+			"email":      User.Email,
+			"username":   User.Username,
+			"age":        User.Age,
+			"updated_at": User.UpdatedAt,
+		},
 	})
 }
 
@@ -156,6 +162,7 @@ func UserDelete(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Your account has been successfully deleted",
+		"status": http.StatusOK,
+		"data":   gin.H{"message": "Your account has been successfully deleted"},
 	})
 }

@@ -39,14 +39,15 @@ func PostPhoto(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusCreated, gin.H{
-
-		"id":         Photo.ID,
-		"title":      Photo.Title,
-		"caption":    Photo.Caption,
-		"photo_url":  Photo.PhotoUrl,
-		"user_id":    Photo.UserID,
-		"created_at": Photo.CreatedAt,
-	})
+		"status": http.StatusCreated,
+		"data": gin.H{
+			"id":         Photo.ID,
+			"title":      Photo.Title,
+			"caption":    Photo.Caption,
+			"photo_url":  Photo.PhotoUrl,
+			"user_id":    Photo.UserID,
+			"created_at": Photo.CreatedAt,
+		}})
 }
 
 func ReadAllPhoto(c *gin.Context) {
@@ -89,7 +90,8 @@ func ReadAllPhoto(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"data": Photos,
+		"status": http.StatusOK,
+		"data":   Photos,
 	})
 
 }
@@ -137,8 +139,18 @@ func UpdatePhoto(c *gin.Context) {
 		})
 		return
 	}
-
-	c.JSON(http.StatusOK, Photo)
+	response := models.ResponseCommentUpdate{
+		ID:        Photo.ID,
+		UpdatedAt: Photo.UpdatedAt,
+		Title:     Photo.Title,
+		Caption:   Photo.Caption,
+		PhotoUrl:  Photo.PhotoUrl,
+		UserID:    Photo.UserID,
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"status": http.StatusOK,
+		"data":   response,
+	})
 }
 
 func DeletePhoto(c *gin.Context) {
@@ -160,6 +172,9 @@ func DeletePhoto(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Your photo has been successfully deleted",
+		"status": http.StatusOK,
+		"data": gin.H{
+			"message": "Your photo has been successfully deleted",
+		},
 	})
 }

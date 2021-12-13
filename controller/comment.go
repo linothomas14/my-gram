@@ -11,7 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func GetComments(ctx *gin.Context){
+func GetComments(ctx *gin.Context) {
 	db := database.GetDB()
 	comments := make([]models.CommentIncludeUserPhoto, 0)
 	rows, err := db.Table("comments").Select(`comments.id, comments.user_id, comments.photo_id, comments.message, 
@@ -25,9 +25,9 @@ func GetComments(ctx *gin.Context){
 		})
 		return
 	}
-	for rows.Next(){
+	for rows.Next() {
 		comment := models.CommentIncludeUserPhoto{}
-		err := rows.Scan(&comment.ID, &comment.UserID, &comment.PhotoID, &comment.Message, &comment.CreatedAt, 
+		err := rows.Scan(&comment.ID, &comment.UserID, &comment.PhotoID, &comment.Message, &comment.CreatedAt,
 			&comment.UpdatedAt, &comment.User.ID, &comment.User.Email, &comment.User.Username, &comment.Photo.ID,
 			&comment.Photo.Title, &comment.Photo.Caption, &comment.Photo.PhotoUrl, &comment.Photo.UserID)
 		if err != nil {
@@ -36,69 +36,80 @@ func GetComments(ctx *gin.Context){
 			})
 			return
 		}
-		comments = append(comments,comment)
+		comments = append(comments, comment)
 	}
-	ctx.JSON(http.StatusOK, gin.H{"data": comments})
+	ctx.JSON(http.StatusOK, gin.H{
+		"status": http.StatusOK,
+		"data":   comments})
 
 }
 
-func StoreComment(ctx *gin.Context){
+func StoreComment(ctx *gin.Context) {
 	db := database.GetDB()
 	userData := ctx.MustGet("userData").(jwt.MapClaims)
 	requestComment := models.RequestComment{}
 	userId := uint(userData["id"].(float64))
 	ctx.ShouldBindJSON(&requestComment)
 	comment := models.Comment{
-		UserID: userId,
-		PhotoID: requestComment.PhotoID,
-		Message: requestComment.Message,
+		UserID:    userId,
+		PhotoID:   requestComment.PhotoID,
+		Message:   requestComment.Message,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
 	err := db.Create(&comment).Error
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{ "message": err.Error(),})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
 	ctx.JSON(http.StatusCreated, gin.H{
-		"id" : comment.ID,
-		"message" : comment.Message,
-		"user_id" : comment.UserID,
-		"photo_id": comment.PhotoID,
-		"created_at" : comment.CreatedAt,
-	})
+		"status": http.StatusCreated,
+		"data": gin.H{
+
+			"id":         comment.ID,
+			"message":    comment.Message,
+			"user_id":    comment.UserID,
+			"photo_id":   comment.PhotoID,
+			"created_at": comment.CreatedAt,
+		}})
 }
 
-func UpdateComment(ctx *gin.Context){
+func UpdateComment(ctx *gin.Context) {
 	db := database.GetDB()
 	requestComment := models.RequestComment{}
-	commentId,_ := strconv.ParseUint(ctx.Param("commentId"),10,64)
+	commentId, _ := strconv.ParseUint(ctx.Param("commentId"), 10, 64)
 	ctx.ShouldBindJSON(&requestComment)
 	comment := models.Comment{
-		ID: uint(commentId),
-		Message: requestComment.Message,
+		ID:        uint(commentId),
+		Message:   requestComment.Message,
 		UpdatedAt: time.Now(),
 	}
 	err := db.Model(&comment).Select("message", "updated_at").Updates(&comment).Error
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{ "message": err.Error(),})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
 	ctx.JSON(http.StatusCreated, gin.H{
-		"id" : comment.ID,
-		"message" : comment.Message,
-		"updated_at" : comment.UpdatedAt,
+		"status": http.StatusCreated,
+		"data": gin.H{
+			"id":         comment.ID,
+			"message":    comment.Message,
+			"updated_at": comment.UpdatedAt,
+		},
 	})
 }
 
-func DeleteComment(ctx *gin.Context){
+func DeleteComment(ctx *gin.Context) {
 	db := database.GetDB()
-	commentId,_ := strconv.ParseUint(ctx.Param("commentId"),10,64)
+	commentId, _ := strconv.ParseUint(ctx.Param("commentId"), 10, 64)
 	comment := models.Comment{ID: uint(commentId)}
 	err := db.Delete(&comment).Error
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{ "message": err.Error(),})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{"message" : "Your comment has been successfully deleted"})
+	ctx.JSON(http.StatusOK, gin.H{
+		"status": http.StatusOK,
+		"data": gin.H{
+			"message": "Your comment has been successfully deleted"}})
 }
