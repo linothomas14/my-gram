@@ -15,8 +15,8 @@ type SocialMedia struct{
 }
 
 type RequestSocialMedia struct{
-	Name string `json:"name" form:"name" validate:"required"`
-	SocialMediaUrl string `json:"social_media_url" form:"social_medial_url" validate:"required"`
+	Name string `json:"name" form:"name" valid:"required"`
+	SocialMediaUrl string `json:"social_media_url" form:"social_medial_url" valid:"required"`
 }
 
 type SocialMediaIncludeUser struct {

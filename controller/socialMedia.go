@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/asaskevich/govalidator"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 )
@@ -58,7 +59,7 @@ func StoreSocialMedia(ctx *gin.Context) {
 		ctx.ShouldBind(&requestSocialMedia)
 	}
 
-	err := helpers.ValidateBody(requestSocialMedia)
+	_, err := govalidator.ValidateStruct(requestSocialMedia)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
@@ -94,19 +95,25 @@ func UpdateSocialMedia(ctx *gin.Context) {
 	requestSocialMedia := models.RequestSocialMedia{}
 	socialMediaId, _ := strconv.ParseUint(ctx.Param("socialMediaId"), 10, 64)
 	userId := uint(userData["id"].(float64))
-	
-	socialMedia := models.SocialMedia{}
-	err := db.First(&socialMedia, "user_id = ? AND id = ?", userId, socialMediaId).Error
-	if err != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"message": "data not found"})
-		return
-	}
 
 	contentType := helpers.GetContentType(ctx)
 	if contentType == appJSON {
 		ctx.ShouldBindJSON(&requestSocialMedia)
 	} else {
 		ctx.ShouldBind(&requestSocialMedia)
+	}
+
+	_, err := govalidator.ValidateStruct(requestSocialMedia)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
+	
+	socialMedia := models.SocialMedia{}
+	err = db.First(&socialMedia, "user_id = ? AND id = ?", userId, socialMediaId).Error
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"message": "data not found"})
+		return
 	}
 	
 	socialMedia = models.SocialMedia{
