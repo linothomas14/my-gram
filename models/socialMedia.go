@@ -1,6 +1,8 @@
 package models
 
-import "time"
+import (
+	"time"
+)
 
 type SocialMedia struct{
 	ID uint `json:"id" gorm:"primaryKey;autoIncrement:true"`
@@ -13,8 +15,8 @@ type SocialMedia struct{
 }
 
 type RequestSocialMedia struct{
-	Name string `json:"name"`
-	SocialMediaUrl string `json:"social_media_url"`
+	Name string `json:"name" form:"name" valid:"required"`
+	SocialMediaUrl string `json:"social_media_url" form:"social_medial_url" valid:"required"`
 }
 
 type SocialMediaIncludeUser struct {

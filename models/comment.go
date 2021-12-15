@@ -14,7 +14,7 @@ type Comment struct{
 }
 
 type RequestComment struct{
-	Message string `json:"message"`
+	Message string `json:"message" valid:"required"`
 	PhotoID uint `json:"photo_id,omitempty"`
 }
 
