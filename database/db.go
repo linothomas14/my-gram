@@ -11,13 +11,16 @@ import (
 	"gorm.io/gorm"
 )
 
-var db  *gorm.DB
+var db *gorm.DB
 
 func StartDB() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
+	if os.Getenv("APP_ENV") != "production" {
+		err := godotenv.Load()
+		if err != nil {
+			log.Fatal("Error loading .env file")
+		}
 	}
+
 	var (
 		host     = os.Getenv("DB_HOST")
 		user     = os.Getenv("DB_USER")
@@ -27,13 +30,13 @@ func StartDB() {
 	)
 
 	dns := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Shanghai", host, user, password, dbName, dbPort)
-	db, err = gorm.Open(postgres.Open(dns), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(dns), &gorm.Config{})
 	if err != nil {
 		log.Fatal("error connection to database", err)
 	}
 
 	fmt.Println("success connect to database")
-	db.Debug().AutoMigrate(models.User{}, models.Photo{},models.Comment{}, models.SocialMedia{})
+	db.Debug().AutoMigrate(models.User{}, models.Photo{}, models.Comment{}, models.SocialMedia{})
 }
 
 func GetDB() *gorm.DB {
