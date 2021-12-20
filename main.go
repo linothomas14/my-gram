@@ -11,7 +11,7 @@ func main() {
 	database.StartDB()
 	r := router.StartApp()
 	port := os.Getenv("PORT")
-	if os.Getenv("APP_ENV") != "production" {
+	if port == "" {
 		port = "8080"
 	}
 
