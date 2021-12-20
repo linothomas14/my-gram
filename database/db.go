@@ -12,10 +12,11 @@ import (
 )
 
 var db *gorm.DB
+var err error
 
 func StartDB() {
 	if os.Getenv("APP_ENV") != "production" {
-		err := godotenv.Load()
+		err = godotenv.Load()
 		if err != nil {
 			log.Fatal("Error loading .env file")
 		}
@@ -30,7 +31,7 @@ func StartDB() {
 	)
 
 	dns := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Shanghai", host, user, password, dbName, dbPort)
-	db, err := gorm.Open(postgres.Open(dns), &gorm.Config{})
+	db, err = gorm.Open(postgres.Open(dns), &gorm.Config{})
 	if err != nil {
 		log.Fatal("error connection to database", err)
 	}
