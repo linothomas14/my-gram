@@ -29,8 +29,12 @@ func StartDB() {
 		dbName   = os.Getenv("DB_NAME")
 	)
 
-	dns := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Shanghai", host, user, password, dbName, dbPort)
-	db, err := gorm.Open(postgres.Open(dns), &gorm.Config{})
+	config := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Shanghai", host, user, password, dbName, dbPort)
+	if os.Getenv("APP_ENV") == "production" {
+		config = fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=require ",host, user, password, dbName,dbPort)
+	}
+	dsn := config
+	db, err := gorm.Open(postgres.Open(dsn),&gorm.Config{})
 	if err != nil {
 		log.Fatal("error connection to database", err)
 	}
